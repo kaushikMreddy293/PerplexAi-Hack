@@ -29,4 +29,17 @@ def get_perplexity_response(user_query: str):
         messages=messages,
     )
 
-    return response.choices[0].message.content
+    # Get main reply
+    reply = response.choices[0].message.content
+
+    # Try to extract citations (safely if they exist)
+    citations = []
+    if hasattr(response, 'citations'):
+        citations = response.citations
+    elif hasattr(response, 'choices') and hasattr(response.choices[0], 'citations'):
+        citations = response.choices[0].citations
+
+    return {
+        "response": reply,
+        "citations": citations  # List of URLs
+    }
