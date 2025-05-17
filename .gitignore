@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+
+# Environment variables
+.env
+
+# VSCode settings
+.vscode/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Uvicorn reload artifacts
+*.pid
+
+# mypy/mypy_cache
+.mypy_cache/
+
+# Jupyter Notebooks checkpoints (if any)
+.ipynb_checkpoints/
