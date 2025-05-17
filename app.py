@@ -17,4 +17,11 @@ if st.button("Ask") and user_query.strip() != "":
         if citations:
             st.markdown("### 🔗 References:")
             for i, link in enumerate(citations, 1):
-                st.markdown(f"[{i}]({link})")
+                # Clean and validate the URL
+                link = link.strip()
+                if link:
+                    try:
+                        # Use HTML to create clickable links with proper formatting
+                        st.markdown(f"{i}. <a href='{link}' target='_blank'>{link}</a>", unsafe_allow_html=True)
+                    except:
+                        st.write(f"{i}. {link}")
