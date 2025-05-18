@@ -3,10 +3,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 
-# Create a client that points to Perplexity's API
 client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
 def get_perplexity_response(user_query: str):
@@ -29,17 +27,23 @@ def get_perplexity_response(user_query: str):
         messages=messages,
     )
 
-    # Get main reply
     reply = response.choices[0].message.content
 
-    # Try to extract citations (safely if they exist)
     citations = []
-    if hasattr(response, 'citations'):
-        citations = response.citations
-    elif hasattr(response, 'choices') and hasattr(response.choices[0], 'citations'):
-        citations = response.choices[0].citations
+    try:
+        if hasattr(response.choices[0], 'citations'):
+            citations = response.choices[0].citations
+        elif hasattr(response, 'citations'):
+            citations = response.citations
+        elif hasattr(response.choices[0].message, 'citations'):
+            citations = response.choices[0].message.citations
+        elif "citations" in response.model_dump():
+            citations = response.model_dump().get("citations", [])
+    except:
+        pass
 
     return {
         "response": reply,
-        "citations": citations  # List of URLs
+        "citations": citations
     }
+
