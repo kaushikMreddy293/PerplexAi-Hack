@@ -1,11 +1,13 @@
 import streamlit as st
 from perplexity_Client import get_perplexity_response
+from db import save_message, get_chat_history
 
 st.set_page_config(page_title="Chat with Perplexity", layout="centered")
 st.title("💬 Chat with Perplexity AI")
 
+# Load chat history from MongoDB into session
 if "messages" not in st.session_state:
-    st.session_state.messages = []  # list of {"role", "content", "citations"}
+    st.session_state.messages = get_chat_history()  # List of {"role", "content", "citations"}
 
 # Display past messages
 for msg in st.session_state.messages:
@@ -20,22 +22,30 @@ for msg in st.session_state.messages:
                 else:
                     st.markdown(f"{i}. {link}")
 
-# New user input
+# Chat input
 if prompt := st.chat_input("Ask something..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Store and show user message
+    user_msg = {"role": "user", "content": prompt}
+    st.session_state.messages.append(user_msg)
+    save_message(role="user", content=prompt)
+
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    # Generate assistant response
     with st.spinner("Thinking..."):
         result = get_perplexity_response(prompt)
         reply = result["response"]
         citations = result["citations"]
 
-    st.session_state.messages.append({
+    assistant_msg = {
         "role": "assistant",
         "content": reply,
         "citations": citations
-    })
+    }
+
+    st.session_state.messages.append(assistant_msg)
+    save_message(role="assistant", content=reply, citations=citations)
 
     with st.chat_message("assistant"):
         st.markdown(reply)
